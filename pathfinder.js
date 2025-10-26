@@ -1,5 +1,11 @@
+// Store all from values for filtering
+let allFromValues = [];
+let chosenFromValues = [];
+
 document.addEventListener('DOMContentLoaded', function() {
     populateSelects();
+    setupSearchFilter();
+    setupDualListSelection();
 });
 
 function populateSelects() {
@@ -7,22 +13,17 @@ function populateSelects() {
     pathData.forEach(item => {
         fromSet.add(item.from);
     });
-    const fromValues = Array.from(fromSet).sort();
-    
+    allFromValues = Array.from(fromSet).sort();
+    chosenFromValues = [];
+
     const toSet = new Set();
     pathData.forEach(item => {
         toSet.add(item.to);
     });
     const toValues = Array.from(toSet).sort();
-    
-    const fromSelect = document.getElementById('fromSelect');
-    fromSelect.innerHTML = '';
-    fromValues.forEach(value => {
-        const option = document.createElement('option');
-        option.value = value;
-        option.textContent = value;
-        fromSelect.appendChild(option);
-    });
+
+    updateAvailableList(allFromValues);
+    updateChosenList();
     
     const toSelect = document.getElementById('toSelect');
     toSelect.innerHTML = '<option value="">-- Select Target --</option>';
@@ -35,13 +36,12 @@ function populateSelects() {
 }
 
 function findPath() {
-    const fromSelect = document.getElementById('fromSelect');
     const toSelect = document.getElementById('toSelect');
     const resultsDiv = document.getElementById('results');
-    
-    const selectedFrom = Array.from(fromSelect.selectedOptions).map(opt => opt.value);
+
+    const selectedFrom = chosenFromValues;
     const selectedTo = toSelect.value;
-    
+
     if (selectedFrom.length === 0) {
         resultsDiv.innerHTML = '<div class="error">Please select at least one source.</div>';
         return;
@@ -151,4 +151,152 @@ function renderPath(start, end, path) {
     
     html += '</div>';
     return html;
+}
+
+// Update available list with filtered values
+function updateAvailableList(values) {
+    const availableList = document.getElementById('availableList');
+    const filteredValues = values.filter(v => !chosenFromValues.includes(v));
+
+    if (filteredValues.length === 0) {
+        availableList.innerHTML = '<div class="list-item" style="cursor: default; opacity: 0.5;">No items available</div>';
+        return;
+    }
+
+    availableList.innerHTML = '';
+    filteredValues.forEach(value => {
+        const item = document.createElement('div');
+        item.className = 'list-item';
+        item.textContent = value;
+        item.dataset.value = value;
+        availableList.appendChild(item);
+    });
+}
+
+// Update chosen list
+function updateChosenList() {
+    const chosenList = document.getElementById('chosenList');
+
+    if (chosenFromValues.length === 0) {
+        chosenList.innerHTML = '<div class="list-item" style="cursor: default; opacity: 0.5;">No items chosen</div>';
+        return;
+    }
+
+    chosenList.innerHTML = '';
+    chosenFromValues.forEach(value => {
+        const item = document.createElement('div');
+        item.className = 'list-item';
+        item.textContent = value;
+        item.dataset.value = value;
+        chosenList.appendChild(item);
+    });
+}
+
+// Setup search filter
+function setupSearchFilter() {
+    const searchInput = document.getElementById('fromSearch');
+
+    searchInput.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+
+        if (searchTerm === '') {
+            updateAvailableList(allFromValues);
+        } else {
+            const filtered = allFromValues.filter(value =>
+                value.toLowerCase().includes(searchTerm)
+            );
+            updateAvailableList(filtered);
+        }
+    });
+}
+
+// Setup dual list selection
+function setupDualListSelection() {
+    const availableList = document.getElementById('availableList');
+    const chosenList = document.getElementById('chosenList');
+
+    // Click to select items
+    availableList.addEventListener('click', function(e) {
+        if (e.target.classList.contains('list-item') && e.target.dataset.value) {
+            e.target.classList.toggle('selected');
+        }
+    });
+
+    chosenList.addEventListener('click', function(e) {
+        if (e.target.classList.contains('list-item') && e.target.dataset.value) {
+            e.target.classList.toggle('selected');
+        }
+    });
+
+    // Double-click to transfer
+    availableList.addEventListener('dblclick', function(e) {
+        if (e.target.classList.contains('list-item') && e.target.dataset.value) {
+            addSelected();
+        }
+    });
+
+    chosenList.addEventListener('dblclick', function(e) {
+        if (e.target.classList.contains('list-item') && e.target.dataset.value) {
+            removeSelected();
+        }
+    });
+}
+
+// Add selected items to chosen list
+function addSelected() {
+    const availableList = document.getElementById('availableList');
+    const selectedItems = availableList.querySelectorAll('.list-item.selected');
+
+    selectedItems.forEach(item => {
+        const value = item.dataset.value;
+        if (value && !chosenFromValues.includes(value)) {
+            chosenFromValues.push(value);
+        }
+    });
+
+    chosenFromValues.sort();
+
+    // Refresh both lists
+    const searchInput = document.getElementById('fromSearch');
+    const searchTerm = searchInput.value.toLowerCase();
+
+    if (searchTerm === '') {
+        updateAvailableList(allFromValues);
+    } else {
+        const filtered = allFromValues.filter(value =>
+            value.toLowerCase().includes(searchTerm)
+        );
+        updateAvailableList(filtered);
+    }
+
+    updateChosenList();
+}
+
+// Remove selected items from chosen list
+function removeSelected() {
+    const chosenList = document.getElementById('chosenList');
+    const selectedItems = chosenList.querySelectorAll('.list-item.selected');
+
+    selectedItems.forEach(item => {
+        const value = item.dataset.value;
+        const index = chosenFromValues.indexOf(value);
+        if (index > -1) {
+            chosenFromValues.splice(index, 1);
+        }
+    });
+
+    // Refresh both lists
+    const searchInput = document.getElementById('fromSearch');
+    const searchTerm = searchInput.value.toLowerCase();
+
+    if (searchTerm === '') {
+        updateAvailableList(allFromValues);
+    } else {
+        const filtered = allFromValues.filter(value =>
+            value.toLowerCase().includes(searchTerm)
+        );
+        updateAvailableList(filtered);
+    }
+
+    updateChosenList();
 }
