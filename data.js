@@ -275,5 +275,53 @@ const pathData = [
     "to": "Marriott Bonvoy Gold Elite",
     "link": "https://travel-partner.marriott.com/miles-and-more/en-gb",
     "comment": "Accelerate to Marriott Bonvoy Gold Elite status (with Lufthansa Miles & More Credit Card issued by Deutsche Bank AG)"
+  },
+  {
+    "from": "Miles & More HON Circle member",
+    "to": "Miles & More Senator",
+    "link": "",
+    "comment": "HON Circle includes all Senator benefits"
+  },
+  {
+    "from": "Miles & More Senator",
+    "to": "Miles & More Frequent Traveller",
+    "link": "",
+    "comment": "Senator includes all Frequent Traveller benefits"
+  },
+  {
+    "from": "Miles & More Frequent Traveller",
+    "to": "Miles & More Base",
+    "link": "",
+    "comment": "Frequent Traveller includes all Base benefits"
+  },
+  {
+    "from": "Wyndham Rewards DIAMOND",
+    "to": "Wyndham Rewards PLATINUM",
+    "link": "",
+    "comment": "Diamond includes all Platinum benefits"
+  },
+  {
+    "from": "Wyndham Rewards PLATINUM",
+    "to": "Wyndham Rewards GOLD",
+    "link": "",
+    "comment": "Platinum includes all Gold benefits"
+  },
+  {
+    "from": "Wyndham Rewards GOLD",
+    "to": "Wyndham Rewards BLUE",
+    "link": "",
+    "comment": "Gold includes all Blue benefits"
+  },
+  {
+    "from": "SIXT Platinum Status",
+    "to": "SIXT Gold Status",
+    "link": "",
+    "comment": "Platinum includes all Gold benefits"
+  },
+  {
+    "from": "SIXT Gold Status",
+    "to": "SIXT Express",
+    "link": "",
+    "comment": "Gold includes all Express benefits"
   }
 ];
